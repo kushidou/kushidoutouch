@@ -1,7 +1,7 @@
 #!/bin/sh
 
 USERNAME=$(who | grep ":0" | cut -d " " -f 1)
-APPDIR=/var/geit-touchscreen/desktops
+APPDIR=/var/kushidou-touchscreen/desktops
 AUTODIR=/etc/xdg/autostart
 MENUDIR=/usr/share/applications
 BINDIR=/usr/bin
@@ -22,5 +22,5 @@ cp $APPDIR/touchscreen-powerup.desktop $AUTODIR
 cp $APPDIR/*.png /usr/share/pixmaps/
 
 #USR/BIN
-ln -s /var/geit-touchscreen/remap-screen /usr/bin/screen-remap
-ln -s /var/geit-touchscreen/setup-screen /usr/bin/screen-setup
+ln -s /var/kushidou-touchscreen/remap-screen /usr/bin/screen-remap
+ln -s /var/kushidou-touchscreen/setup-screen /usr/bin/screen-setup

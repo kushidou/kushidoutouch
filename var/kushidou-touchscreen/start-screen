@@ -2,8 +2,8 @@
 
 #开机自动重映射
 
-log_path="/var/geit-touchscreen/touchscreen.log"
-screenmap_path="/var/geit-touchscreen/config"
+log_path="/var/kushidou-touchscreen/touchscreen.log"
+screenmap_path="/var/kushidou-touchscreen/config"
 
 
 

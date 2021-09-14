@@ -2,8 +2,8 @@
 
 #执行初始化的过程，按照文件恢复设置
 
-log_path="/var/geit-touchscreen/touchscreen.log"
-screenmap_path="/var/geit-touchscreen/config"
+log_path="/var/kushidou-touchscreen/touchscreen.log"
+screenmap_path="/var/kushidou-touchscreen/config"
 
 sleep 2
 

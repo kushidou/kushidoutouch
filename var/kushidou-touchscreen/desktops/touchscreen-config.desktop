@@ -4,4 +4,4 @@ Icon=/usr/share/pixmaps/screen-config.png
 GenericName[zh_CN]=配置触摸设备和屏幕的映射关系
 Name=ConfigTouch
 Name[zh_CN]=配置触摸映射
-Exec=/var/geit-touchscreen/setup-screen 
+Exec=/var/kushidou-touchscreen/setup-screen 

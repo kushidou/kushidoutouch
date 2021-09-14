@@ -4,4 +4,4 @@ Type=Application
 GenericName[zh_CN]=开机屏幕自动映射
 Name=autoRemap
 Name[zh_CN]=开机屏幕自动映射
-Exec=/var/geit-touchscreen/start-screen 
+Exec=/var/kushidou-touchscreen/start-screen 

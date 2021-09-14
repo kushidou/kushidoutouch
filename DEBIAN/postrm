@@ -1,7 +1,7 @@
 #!/bin/sh
 
 USERNAME=$(who | grep ":0" | cut -d " " -f 1)
-APPDIR=/var/geit-touchscreen/desktops
+APPDIR=/var/kushidou-touchscreen/desktops
 AUTODIR=/etc/xdg/autostart
 MENUDIR=/usr/share/applications
 

@@ -12,4 +12,4 @@ for device in iter(monitor.poll, None):
     if device.driver != "hid-multitouch":
         continue
     if device.action == "add" or device.action == "change":
-        os.system("/var/geit-touchscreen/remap-screen")
+        os.system("/var/kushidou-touchscreen/remap-screen")
