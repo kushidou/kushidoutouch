@@ -1,0 +1,6 @@
+[Desktop Entry]
+Icon=/usr/share/pixmaps/screen-remap.png
+Exec=/var/geit-touchscreen/remap-screen 
+Name=触摸映射
+Type=Application
+X-Deepin-Vendor=user-custom

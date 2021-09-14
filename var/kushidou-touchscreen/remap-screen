@@ -1,0 +1,50 @@
+#!/bin/bash
+
+#执行初始化的过程，按照文件恢复设置
+
+log_path="/var/geit-touchscreen/touchscreen.log"
+screenmap_path="/var/geit-touchscreen/config"
+
+sleep 2
+
+echo -e $(date)"\t设备变化自动重映射" >> $log_path
+
+while read LINE
+    do
+        tmp1=`echo $LINE | cut -d ' ' -f 1`
+        tmp2=`echo $LINE | cut -d ' ' -f 2`
+		tmp3=`echo $LINE | cut -d ' ' -f 3`
+		tmp4=`echo $LINE | cut -d ' ' -f 4`
+        tmp5=`echo $LINE | cut -d ' ' -f 5`
+
+		touchdev_id_change=0
+		for touch_id in $(xinput | grep -i -E 'touch|ILITEK' | cut -d '=' -f 2 | cut -f 1)
+		do
+			input_dev=$(xinput list-props $touch_id | grep "Device Node" | awk -F : '{print $2}' | awk -F \" '{print $2}' | awk '{print $1}')
+        	touch_screen=$(udevadm info $input_dev | grep "ID_INPUT_TOUCHSCREEN")
+        	if [ "$touch_screen" == "" ];then
+            	continue
+        	fi
+
+            dev=$(udevadm info $input_dev | grep "ID_SERIAL=" | cut -d "=" -f 2)
+			vid_t=$(udevadm info $input_dev | grep "ID_VENDOR_ID=" | cut -d "=" -f 2)
+			pid_t=$(udevadm info $input_dev | grep "ID_MODEL_ID=" | cut -d "=" -f 2)
+            path_t=$(udevadm info $input_dev | grep "ID_PATH=" | cut -d "=" -f 2)
+			if [ "$tmp1" == "$vid_t" ] && [ "$tmp2" == "$pid_t" ] && [ "$tmp3" == "$path_t" ] && [ "$tmp4" == "$dev" ];then
+				touchdev_id_change=$touch_id
+				xinput map-to-output $touchdev_id_change $tmp5
+                echo "xinput map-to-output $touchdev_id_change $tmp5" >> $log_path
+			fi
+	    done
+
+		if [ $? = 0 ];then
+			echo $tmp4"("$tmp1":"$tmp2"@"$tmp3")  -->  "$tmp5 >> $log_path
+		else
+			echo $tmp4"("$tmp1":"$tmp2"@"$tmp3")  -->  "$tmp5 >> $log_path
+		fi
+	done < $screenmap_path
+
+	echo "===========================================" >> $log_path
+	echo " " >> $log_path
+	echo " " >> $log_path
+

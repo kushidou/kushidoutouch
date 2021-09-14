@@ -1,0 +1,9 @@
+Package: kushidoutouch
+Version: 1.0
+Architecture: arm64
+Maintainer: Kushidou <tangzhen1219@gmail.com>
+Installed-Size: 67
+Depends: xinput, python3, python3-pip
+Section: x11
+Priority: optional
+Description: Fix touch-screen(s) for Linux X11.

@@ -1,0 +1,26 @@
+#!/bin/sh
+
+USERNAME=$(who | grep ":0" | cut -d " " -f 1)
+APPDIR=/var/geit-touchscreen/desktops
+AUTODIR=/etc/xdg/autostart
+MENUDIR=/usr/share/applications
+
+# desktop
+rm /home/$USERNAME/Desktop/touchscreen-config.desktop 
+rm /home/$USERNAME/Desktop/touchscreen-now.desktop
+
+# start menu
+rm $MENUDIR/touchscreen-config.desktop 
+rm $MENUDIR/touchscreen-now.desktop
+
+# autostart
+rm $AUTODIR/touchscreen-autoremap.desktop 
+rm $AUTODIR/touchscreen-powerup.desktop
+
+#ICOS
+rm /usr/share/pixmaps/screen-config.png
+rm /usr/share/pixmaps/screen-remap.png
+
+#USR/BIN
+rm /usr/bin/screen-remap
+rm /usr/bin/screen-setup
