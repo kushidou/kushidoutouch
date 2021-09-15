@@ -2,20 +2,24 @@
 
 ## 功能 Function
 
+基于bash脚本和**pyudev**，为多显示器、多触摸屏的Linux操作系统提供稳定可靠自动的触摸屏映射方案。
 
 
 ## 打包方式 Package
 
-把`DEBIAN`, `USR`, `var`三个文件夹复制到一个新的文件夹中，修改`DEBIAN/control`信息，退到新文件夹上级目录
+检查package.sh的可执行权限
 
 ```bash
-Package: kushidoutouch      # Your Software Name
-Version: 1.0                # Your version
-Architecture: arm64         # x86, amd64, arm64, aarch, etc.
+./package.sh
 ```
 
-打包指令如下，xxx为软件目录，后面版本号和架构最好一致（名称不影响实际安装）
+期间会要求输入密码，该密码用于检查内部文件的权限，并读取、打印版本号。也可以使用指令直接打包（权限正确的话）：
 
 ```bash
-dpkg -b ./xxx Kushidoutouch-1.0_arm64.deb
+dpkg -b ./kushidoutouch ./kushidouTouch-${vers}_${arch}.deb
 ```
+
+
+2021(c)@kushidou
+允许自由下载、修改、使用和分发。
+

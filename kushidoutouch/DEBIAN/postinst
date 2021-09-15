@@ -1,18 +1,22 @@
 #!/bin/sh
 
-USERNAME=$(who | grep ":0" | cut -d " " -f 1)
+
+
 APPDIR=/var/kushidou-touchscreen/desktops
 AUTODIR=/etc/xdg/autostart
 MENUDIR=/usr/share/applications
 BINDIR=/usr/bin
 
-# desktop
-cp $APPDIR/touchscreen-config.desktop /home/$USERNAME/Desktop
-cp $APPDIR/touchscreen-now.desktop /home/$USERNAME/Desktop
-
 # start menu
 cp $APPDIR/touchscreen-config.desktop $MENUDIR
 cp $APPDIR/touchscreen-now.desktop $MENUDIR
+
+# desktop
+for USERNAME in $(cat /etc/passwd | awk -F: '$3>=500' | cut -d : -f 1)
+do
+    cp $APPDIR/touchscreen-config.desktop /home/$USERNAME/Desktop
+    cp $APPDIR/touchscreen-now.desktop /home/$USERNAME/Desktop
+done
 
 # autostart
 cp $APPDIR/touchscreen-autoremap.desktop $AUTODIR
