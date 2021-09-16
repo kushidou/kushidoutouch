@@ -1,5 +1,5 @@
 [Desktop Entry]
-Exec=/usr/bin/touchmap-udev.py
+Exec=/usr/bin/remap-auto-udev.py
 Name=掉线自动重映射
 Type=Application
 X-Deepin-Vendor=user-custom
