@@ -1,7 +1,5 @@
 #!/bin/sh
 
-
-
 APPDIR=/var/kushidou-touchscreen/desktops
 AUTODIR=/etc/xdg/autostart
 MENUDIR=/usr/share/applications
@@ -14,6 +12,9 @@ cp $APPDIR/touchscreen-now.desktop $MENUDIR
 # desktop
 for USERNAME in $(cat /etc/passwd | awk -F: '$3>=500' | cut -d : -f 1)
 do
+    if [ $USERNAME == "nobody" ];then
+        continue
+    fi
     cp $APPDIR/touchscreen-config.desktop /home/$USERNAME/Desktop
     cp $APPDIR/touchscreen-now.desktop /home/$USERNAME/Desktop
 done

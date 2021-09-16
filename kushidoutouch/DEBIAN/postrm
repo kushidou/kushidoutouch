@@ -1,13 +1,18 @@
 #!/bin/sh
 
-USERNAME=$(who | grep ":0" | cut -d " " -f 1)
 APPDIR=/var/kushidou-touchscreen/desktops
 AUTODIR=/etc/xdg/autostart
 MENUDIR=/usr/share/applications
 
 # desktop
-rm /home/$USERNAME/Desktop/touchscreen-config.desktop 
-rm /home/$USERNAME/Desktop/touchscreen-now.desktop
+for USERNAME in $(cat /etc/passwd | awk -F: '$3>=500' | cut -d : -f 1)
+do
+    if [ $USERNAME == "nobody" ];then
+        continue
+    fi
+    rm /home/$USERNAME/Desktop/touchscreen-config.desktop 
+    rm /home/$USERNAME/Desktop/touchscreen-now.desktop
+done
 
 # start menu
 rm $MENUDIR/touchscreen-config.desktop 

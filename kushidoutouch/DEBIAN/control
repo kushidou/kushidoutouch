@@ -1,5 +1,5 @@
 Package: kushidoutouch
-Version: 1.1
+Version: 1.1.2
 Architecture: all
 Maintainer: Kushidou <tangzhen1219@gmail.com>
 Depends: xinput, python3, python3-pip, zenity
