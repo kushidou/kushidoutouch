@@ -1,8 +1,0 @@
-[Desktop Entry]
-Icon=/usr/share/pixmaps/screen-remap.png
-Exec=/var/kushidou-touchscreen/remap-screen 
-GenericName[zh_CN]=立即修复触摸紊乱
-Name=RemapTouch
-Name[zh_CN]=映射触摸屏
-Type=Application
-X-Deepin-Vendor=user-custom

@@ -1,0 +1,6 @@
+[Desktop Entry]
+Exec=python3 /usr/bin/kscreen-auto-udev
+Name=RemapPlugin
+Name[zh_CN]=插拔自动映射
+Type=Application
+

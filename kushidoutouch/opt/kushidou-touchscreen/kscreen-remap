@@ -1,0 +1,76 @@
+#!/bin/bash
+# 重映射脚本
+# 09 29 2021, 将开机和自动映射脚本整合成同一个。
+
+readonly log_path="/var/log/kushidou-touchscreen/touchscreen.log"
+readonly screenmap_path="/opt/kushidou-touchscreen/config"
+
+# 默认使用英文日志
+MYLANG=$(locale | grep LANGUAGE | cut -d '=' -f 2 | cut -d '_' -f 1)
+if [ ! "$MYLANG" = "zh" ] ; then
+    MYLANG="en"
+fi
+
+readonly log_1_zh="开机自动映射"
+readonly log_2_zh="插拔自动映射"
+readonly log_3_zh="用户手动执行映射"
+readonly title_zh="屏幕触摸设置@kushidou"
+readonly info_zh="重映射成功。"
+
+readonly log_1_en="remap @ POWER ON"
+readonly log_2_en="remap @ PLUG IN"
+readonly log_3_en="remap @ USER CLICK"
+readonly title_en="Touch-screen@kushidou"
+readonly info_en="Remap_Success."
+
+case ${1} in
+1)
+	eval "log_cont=\$log_1_${MYLANG}"
+	;;
+2)
+	eval "log_cont=\$log_2_${MYLANG}"
+	;;
+3)
+	eval "log_cont=\$log_3_${MYLANG}"
+	;;
+esac
+
+eval "wtitle=\$title_${MYLANG}"
+eval "winfo=\$info_${MYLANG}"
+sleep 1
+
+echo -e $(date)"\t$log_cont" >> $log_path
+while read LINE
+do
+	tmp1=`echo $LINE | cut -d ' ' -f 1`
+	tmp2=`echo $LINE | cut -d ' ' -f 2`
+	tmp3=`echo $LINE | cut -d ' ' -f 3`
+	tmp4=`echo $LINE | cut -d ' ' -f 4`
+	tmp5=`echo $LINE | cut -d ' ' -f 5`
+
+	touchdev_id_change=0
+	for touch_id in $(xinput | grep -i -E 'touch|ILITEK' | cut -d '=' -f 2 | cut -f 1)
+	do
+		input_dev=$(xinput list-props $touch_id | grep "Device Node" | awk -F : '{print $2}' | awk -F \" '{print $2}' | awk '{print $1}')
+		touch_screen=$(udevadm info $input_dev | grep "ID_INPUT_TOUCHSCREEN")
+
+		dev=$(udevadm info $input_dev | grep "ID_SERIAL=" | cut -d "=" -f 2)
+		vid_t=$(udevadm info $input_dev | grep "ID_VENDOR_ID=" | cut -d "=" -f 2)
+		pid_t=$(udevadm info $input_dev | grep "ID_MODEL_ID=" | cut -d "=" -f 2)
+		path_t=$(udevadm info $input_dev | grep "ID_PATH=" | cut -d "=" -f 2)
+		if [ "$tmp1" == "$vid_t" ] && [ "$tmp2" == "$pid_t" ] && [ "$tmp3" == "$path_t" ] && [ "$tmp4" == "$dev" ];then
+			touchdev_id_change=$touch_id
+			xinput map-to-output $touchdev_id_change $tmp5
+			echo "$touchdev_id_change: $tmp4($tmp1:$tmp2 @ $tmp3 )  -->  $tmp5" >> $log_path
+		fi
+	done
+done < $screenmap_path
+
+echo "=====================END======================" >> $log_path
+echo " " >> $log_path
+echo " " >> $log_path
+
+if [ "$1" != "1" ];then
+	zenity --info --title="$wtitle" --text="$winfo"
+fi
+exit 0

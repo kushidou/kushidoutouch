@@ -1,0 +1,6 @@
+#!/bin/bash
+inslog_path="/var/log/kushidou-touchscreen/install.log"
+
+echo "uninstall: $(date)" >> $inslog_path
+ps -ef | grep kscreen-auto-udev | awk '{print $2}' | xargs kill -9 > /dev/null 2>&1
+echo "kill running process -- 0" >> $inslog_path

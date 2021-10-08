@@ -1,31 +1,40 @@
 #!/bin/sh
 
-APPDIR=/var/kushidou-touchscreen/desktops
+APPDIR=/opt/kushidou-touchscreen/desktops
 AUTODIR=/etc/xdg/autostart
 MENUDIR=/usr/share/applications
+
+inslog_path="/var/log/kushidou-touchscreen/install.log"
 
 # desktop
 for USERNAME in $(cat /etc/passwd | awk -F: '$3>=500' | cut -d : -f 1)
 do
-    if [ $USERNAME == "nobody" ];then
-        continue
-    fi
-    rm /home/$USERNAME/Desktop/touchscreen-config.desktop 
-    rm /home/$USERNAME/Desktop/touchscreen-now.desktop
+    [ -f /home/$USERNAME/Desktop/touchscreen-config.desktop ] && rm -f /home/$USERNAME/Desktop/touchscreen-config.desktop
+    [ -f /home/$USERNAME/Desktop/touchscreen-now.desktop ] && rm -f /home/$USERNAME/Desktop/touchscreen-now.desktop
+    [ -f /home/$USERNAME/桌面/touchscreen-config.desktop ] && rm -f /home/$USERNAME/桌面/touchscreen-config.desktop
+    [ -f /home/$USERNAME/桌面/touchscreen-now.desktop ] && rm -f /home/$USERNAME/桌面/touchscreen-now.desktop
+    echo "remove desktop-files from $USERNAME" >> $inslog_path
+
 done
 
 # start menu
-rm $MENUDIR/touchscreen-config.desktop 
-rm $MENUDIR/touchscreen-now.desktop
+rm $MENUDIR/touchscreen-config.desktop >/dev/null 2>&1
+rm $MENUDIR/touchscreen-now.desktop >/dev/null 2>&1
+echo "remove desktop-files from start-menu -- $?" >> $inslog_path
 
 # autostart
-rm $AUTODIR/touchscreen-autoremap.desktop 
-rm $AUTODIR/touchscreen-powerup.desktop
+rm $AUTODIR/touchscreen-autoremap.desktop >/dev/null 2>&1
+rm $AUTODIR/touchscreen-powerup.desktop >/dev/null 2>&1
+echo "cancel auto start -- $?" >> $inslog_path
 
 #ICOS
-rm /usr/share/pixmaps/screen-config.png
-rm /usr/share/pixmaps/screen-remap.png
+rm /usr/share/pixmaps/screen-config.png >/dev/null 2>&1
+rm /usr/share/pixmaps/screen-remap.png >/dev/null 2>&1
+echo "remove icons -- $?" >> $inslog_path
 
 #USR/BIN
-rm /usr/bin/screen-remap
-rm /usr/bin/screen-setup
+rm -f /usr/bin/kscreen-remap >/dev/null 2>&1
+rm -f /usr/bin/kscreen-setup >/dev/null 2>&1
+echo "remove links from /usr/bin -- $?" >> $inslog_path
+echo "Remove Success. Thanks for using." >> $inslog_path
+echo " " >> $inslog_path

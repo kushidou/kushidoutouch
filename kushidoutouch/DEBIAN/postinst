@@ -1,31 +1,78 @@
 #!/bin/sh
 
-APPDIR=/var/kushidou-touchscreen/desktops
+BUILDDATE=
+KTVERSION=
+APPDIR=/opt/kushidou-touchscreen/desktops
 AUTODIR=/etc/xdg/autostart
 MENUDIR=/usr/share/applications
 BINDIR=/usr/bin
+log_path="/var/log/kushidou-touchscreen/touchscreen.log"
+inslog_path="/var/log/kushidou-touchscreen/install.log"
 
+LOGINUSER=$(whoami)
+
+mkdir -p /var/log/kushidou-touchscreen/
+echo "build date: $BUILDDATE" >> ${inslog_path}
+echo "ver: $KTVERSION" >> ${inslog_path}
+echo "install: $(date)" >> ${inslog_path}
 # start menu
-cp $APPDIR/touchscreen-config.desktop $MENUDIR
-cp $APPDIR/touchscreen-now.desktop $MENUDIR
+install -p -m 0755 -o root -g root ${APPDIR}/touchscreen-config.desktop ${MENUDIR}
+install -p -m 0755 -o root -g root ${APPDIR}/touchscreen-now.desktop ${MENUDIR}
+echo "copy desktop-files to start menu -- $?" >> $inslog_path
 
 # desktop
 for USERNAME in $(cat /etc/passwd | awk -F: '$3>=500' | cut -d : -f 1)
 do
-    if [ $USERNAME == "nobody" ];then
-        continue
+    if [ -d "/home/${USERNAME}/Desktop" ];then
+        install -p -m 0755 -o ${USERNAME} ${APPDIR}/touchscreen-config.desktop /home/${USERNAME}/Desktop >/dev/null 2>&1
+        install -p -m 0755 -o ${USERNAME} ${APPDIR}/touchscreen-now.desktop /home/${USERNAME}/Desktop >/dev/null 2>&1
+        echo "copy desktop-files to ${USERNAME} Desktop -- $?" >> $inslog_path
     fi
-    cp $APPDIR/touchscreen-config.desktop /home/$USERNAME/Desktop
-    cp $APPDIR/touchscreen-now.desktop /home/$USERNAME/Desktop
+    if [ -d "/home/${USERNAME}/桌面" ];then
+        install -p -m 0755 -o ${USERNAME} ${APPDIR}/touchscreen-config.desktop /home/${USERNAME}/桌面 >/dev/null 2>&1
+        install -p -m 0755 -o ${USERNAME} ${APPDIR}/touchscreen-now.desktop /home/${USERNAME}/桌面 >/dev/null 2>&1
+        echo "copy desktop-files to ${USERNAME} Desktop -- $?" >> $inslog_path
+    fi
 done
 
 # autostart
-cp $APPDIR/touchscreen-autoremap.desktop $AUTODIR
-cp $APPDIR/touchscreen-powerup.desktop $AUTODIR
+install -p -m 0755 -o root -g root  ${APPDIR}/touchscreen-autoremap.desktop ${AUTODIR}
+install -p -m 0755 -o root -g root  ${APPDIR}/touchscreen-powerup.desktop ${AUTODIR}
+echo "set auto start @ power on -- $?" >> $inslog_path
 
 #ICOS
-cp $APPDIR/*.png /usr/share/pixmaps/
+cp ${APPDIR}/*.png /usr/share/pixmaps/
+echo "copy icons to system -- $?" >> $inslog_path
 
 #USR/BIN
-ln -s /var/kushidou-touchscreen/remap-screen /usr/bin/screen-remap
-ln -s /var/kushidou-touchscreen/setup-screen /usr/bin/screen-setup
+ln -s /opt/kushidou-touchscreen/kscreen-remap /usr/bin/kscreen-remap
+ln -s /opt/kushidou-touchscreen/kscreen-setup /usr/bin/kscreen-setup
+echo "make links for shell scripts -- $?" >> $inslog_path
+
+# build log dir an file
+mkdir -p /var/log/kushidou-touchscreen/
+touch $log_path
+echo "make log files -- $?" >> $inslog_path
+
+#check pyudev
+pipinstall=$(pip3 list | grep pyudev | cut -d ' ' -f 1)
+aptinstall=$(dpkg -l | grep python3-pyudev | cut -d ' ' -f 1)
+
+if [ ! ${pipinstall} ] && [ ! ${aptinstall} ];then
+    echo "It's suggested to install python3-pyudev(apt/yum) or pyudev(pip3)"
+    echo "It's suggested to install python3-pyudev(apt/yum) or pyudev(pip3)" >> $log_path
+    echo "pyudev not installed, auto remap after plugin will not work -- $?" >> $inslog_path
+else
+    echo "pyudev installed. -- 0" >> $inslog_path
+    echo "Reboot to enable auto-remap function."
+fi
+
+chown ${LOGINUSER}:${LOGINUSER} /var/log/kushidou-touchscreen -R
+chmod 0777 /var/log/kushidou-touchscreen/ -R
+echo "set mode of logdir: 0777 -- $?" >> $inslog_path
+
+echo "Install finished, ENJOY." >> $inslog_path
+echo "Any question or bugs, mail → tangzhen1219@gmail.com" >> $inslog_path
+echo " " >> $inslog_path
+echo "Install finished. See $inslog_path for more information."
+

@@ -1,15 +1,34 @@
 #!/bin/bash
 
-log_path="/var/kushidou-touchscreen/touchscreen.log"
-screenmap_path="/var/kushidou-touchscreen/config"
-screen_tmp_path="/var/kushidou-touchscreen/screentmp"
+log_path="/var/log/kushidou-touchscreen/touchscreen.log"
+screenmap_path="/opt/kushidou-touchscreen/config"
+screen_tmp_path="/opt/kushidou-touchscreen/screentmp"
 
-T0="zenity --info --title="屏幕触摸设置""
-T1="--text="请选择要设置的屏幕""
-T2="--ok-label="退出""
+T0="zenity --info --title=TouchScreenSetup"
+T1="--text=Please_Select_Screen-name"
+T2="--ok-label=Exit"
 T3="--extra-button="
-T4="--ok-label="返回""
-T5="--text="请选择与该屏对应的触摸设备""
+T4="--ok-label=Back"
+T5="--text=Please_Select_Input_Device"
+log_noscreen="No_screen_detected"
+log_noinput="No_touch_device_detected"
+log_start="Start setup map"
+log_finish="Setup finished."
+
+MYLANG=$(locale | grep LANGUAGE | cut -d '=' -f 2 | cut -d '_' -f 1)
+if [ "$MYLANG" == "zh" ] ; then
+    T0="zenity --info --title=屏幕触摸设置"
+	T1="--text=请选择要设置的屏幕"
+	T2="--ok-label=退出"
+	T3="--extra-button="
+	T4="--ok-label=返回"
+	T5="--text=请选择与该屏对应的触摸设备"
+	log_noscreen="没有识别到屏幕"
+	log_noinput="没有识别到设备"
+	log_start="开始设置触摸屏"
+	log_finish="设置完成"
+fi
+
 
 # 设置完立即重映射
 update_xinputmapout()
@@ -38,10 +57,10 @@ update_xinputmapout()
 				xinput map-to-output $touchdev_id_change $tmp5
 			fi
 	    done
-        
-		
+
     done < $screenmap_path
 }
+
 
 # 更新设备映射信息，在原有“名称”的基础上增加vid:pid识别
 # 格式：vid pid path name screen
@@ -66,19 +85,21 @@ update_screenmap()
 }
 
 
-select_touchdev()
+select_touchdevice()
 {
 	touchdev_count=0
 	# 计算触摸屏总数
-	for touch_id in $(xinput | grep -i -E 'touch|ILITEK' | cut -d '=' -f 2 | cut -f 1)
+	for touch_id in $(xinput | grep -i -E 'touch|ILITEK|Touch|eGalax' | cut -d '=' -f 2 | cut -f 1)
 	do
 		input_dev=$(xinput list-props $touch_id | grep "Device Node" | awk -F : '{print $2}' | awk -F \" '{print $2}' | awk '{print $1}')
 		touch_screen=$(udevadm info $input_dev | grep "ID_INPUT_TOUCHSCREEN")
 			let touchdev_count++
 	done
 
+	# 没有触摸屏则退出
 	if [ $touchdev_count == 0 ];then
-		select_screen=`$T0 --text="没有识别到触摸设备" $T2`
+		select_screen=`$T0 --text=$log_noinput $T2`
+		echo "NO TOUCH DEVICE!" >> $log_path
 		exit 0
 	fi
 
@@ -105,13 +126,14 @@ select_touchdev()
    	fi
 }
 
+
 init_screenmap()
 {
 	# 初始化时添加新的屏幕
-	echo "检查日志文件，删除配置文件内容，准备屏幕列表"
+	# "检查日志文件，删除配置文件内容，准备屏幕列表"
 	touch $log_path
-    rm $screenmap_path
-	rm $screen_tmp_path
+    rm $screenmap_path >> /dev/null 2>&1
+	rm $screen_tmp_path >> /dev/null 2>&1
 	# 获得屏幕列表
 	for screen_connect in $(xrandr | grep " connected" | cut -d ' ' -f 1)
 	do
@@ -120,22 +142,23 @@ init_screenmap()
 }
 
 
-echo -e $(date)"\t开始配置触摸屏" >> $log_path
+echo -e "$(date)\t$log_start" >> $log_path
 init_screenmap
 update_count=1
 while [ 1 ]
 do
-	
 	# 计算屏幕总数=配置文件行数
 	screen_count=$(cat $screen_tmp_path | wc -l)
 
 	# 如果没有屏则退出
 	if [ $screen_count == 0 ];then
-		select_screen=`$T0 --text="没有识别到屏幕" $T2`
+		select_screen=`$T0 --text=$log_noscreen`
+		echo "NO SCREENS!" >> $log_path
+		echo " " >> $log_path
 		exit 0
 	fi
 
-	SELECTCOM="$T0 $T1 $T2"
+	SELECTCOM="$T0 $T1 "
 	while read LINE
 	do
 		SELECTCOM="$SELECTCOM $T3$LINE"
@@ -146,13 +169,13 @@ do
     echo selected:$select_screen
 
 	if [ "$select_screen" = "" ];then
-		echo -e $(date)"\t配置完成" >> $log_path
-		echo "===========================================" >> $log_path
+		echo -e "$(date)\t$log_finish" >> $log_path
+		echo "=====================END======================" >> $log_path
 		echo " " >> $log_path
 		rm $screen_tmp_path
 		break
 	else
-		select_touchdev
+		select_touchdevice
 	fi
 done
-
+exit 0

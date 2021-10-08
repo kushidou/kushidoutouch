@@ -1,8 +1,13 @@
 Package: kushidoutouch
-Version: 1.1.2
+Version: 1.1.4
 Architecture: all
 Maintainer: Kushidou <tangzhen1219@gmail.com>
-Depends: xinput, python3, python3-pip, zenity
+Depends: xinput, python3, zenity
+Suggests: python3-pip, python3-pyudev
 Section: x11
 Priority: optional
-Description: Fix touch-screen(s) for Linux X11.
+Description: Remap touch-screen(s) for Linux X11 with 2 or more screens. 
+    Setup the relationship between touch-devices and screens with dialog box,
+    you should just click mouse.
+    If pyudev lib is installed, fortunately, your touch-devices will be remap 
+    automaticlly after plug out an in.

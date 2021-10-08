@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # -- coding: UTF-8 --
 # -- Author: Blues --
+# 29.9.2021, Kushidou
 
 import pyudev
 import os
@@ -12,4 +13,4 @@ for device in iter(monitor.poll, None):
     if device.driver != "hid-multitouch":
         continue
     if device.action == "add" or device.action == "change":
-        os.system("/var/kushidou-touchscreen/remap-screen")
+        os.system("/opt/kushidou-touchscreen/kscreen-remap 2")

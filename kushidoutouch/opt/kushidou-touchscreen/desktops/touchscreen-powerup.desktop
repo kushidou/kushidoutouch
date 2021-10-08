@@ -1,7 +1,8 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
+GenericName=RemapatStart
 GenericName[zh_CN]=开机屏幕自动映射
 Name=RemapatStart
 Name[zh_CN]=开机屏幕自动映射
-Exec=/var/kushidou-touchscreen/start-screen 
+Exec=/opt/kushidou-touchscreen/kscreen-remap 1
