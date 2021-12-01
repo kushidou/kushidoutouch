@@ -2,6 +2,7 @@
 
 log_path="/var/log/kushidou-touchscreen/touchscreen.log"
 screenmap_path="/opt/kushidou-touchscreen/config"
+screenmap_tmp_path="/opt/kushidou-touchscreen/config.tmp"
 screen_tmp_path="/opt/kushidou-touchscreen/screentmp"
 
 T0="zenity --info --title=TouchScreenSetup"
@@ -14,6 +15,7 @@ log_noscreen="No_screen_detected"
 log_noinput="No_touch_device_detected"
 log_start="Start setup map"
 log_finish="Setup finished."
+log_exit="Exit without Saving"
 
 MYLANG=$(locale | grep LANGUAGE | cut -d '=' -f 2 | cut -d '_' -f 1)
 if [ "$MYLANG" == "zh" ] ; then
@@ -27,6 +29,7 @@ if [ "$MYLANG" == "zh" ] ; then
 	log_noinput="没有识别到设备"
 	log_start="开始设置触摸屏"
 	log_finish="设置完成"
+	log_exit="退出未保存"
 fi
 
 
@@ -58,7 +61,7 @@ update_xinputmapout()
 			fi
 	    done
 
-    done < $screenmap_path
+    done < $screenmap_tmp_path
 }
 
 
@@ -78,7 +81,7 @@ update_screenmap()
 	path_touch=$(udevadm info $input_dev | grep "ID_PATH=" | cut -d "=" -f 2)
 	# 写入配置
 
-	echo "$vid_touch $pid_touch $path_touch $select_touchdev $select_screen" >> $screenmap_path
+	echo "$vid_touch $pid_touch $path_touch $select_touchdev $select_screen" >> $screenmap_tmp_path
     echo $update_count': '$vid_touch' '$pid_touch' '$path_touch' '$select_touchdev'   -->   '$select_screen >> $log_path
 	update_xinputmapout
 	let update_count++
@@ -89,7 +92,7 @@ select_touchdevice()
 {
 	touchdev_count=0
 	# 计算触摸屏总数
-	for touch_id in $(xinput | grep -i -E 'touch|ILITEK|Touch|eGalax' | cut -d '=' -f 2 | cut -f 1)
+	for touch_id in $(xinput | grep -i -E 'touch|ILITEK|Touch|eGalax|Weida|Goodix' | cut -d '=' -f 2 | cut -f 1)
 	do
 		input_dev=$(xinput list-props $touch_id | grep "Device Node" | awk -F : '{print $2}' | awk -F \" '{print $2}' | awk '{print $1}')
 		touch_screen=$(udevadm info $input_dev | grep "ID_INPUT_TOUCHSCREEN")
@@ -130,9 +133,10 @@ select_touchdevice()
 init_screenmap()
 {
 	# 初始化时添加新的屏幕
-	# "检查日志文件，删除配置文件内容，准备屏幕列表"
+	# "检查日志文件，~~删除配置文件内容~~创建临时配置文件用于保存，准备屏幕列表"
 	touch $log_path
-    rm $screenmap_path >> /dev/null 2>&1
+    #rm $screenmap_path >> /dev/null 2>&1
+	touch $screenmap_tmp_path >> /dev/null 2>&1
 	rm $screen_tmp_path >> /dev/null 2>&1
 	# 获得屏幕列表
 	for screen_connect in $(xrandr | grep " connected" | cut -d ' ' -f 1)
@@ -164,11 +168,21 @@ do
 		SELECTCOM="$SELECTCOM $T3$LINE"
 	done < $screen_tmp_path
 
-	SELECTCOM="$SELECTCOM $T2"
+	[[ $(cat $screenmap_tmp_path) = "" ]] && SELECTCOM="$SELECTCOM ${T3}Save $T2"
+	[[ ! $(cat $screenmap_tmp_path) = "" ]] && SELECTCOM="$SELECTCOM $T2"
 	select_screen=`$SELECTCOM`
     echo selected:$select_screen
 
 	if [ "$select_screen" = "" ];then
+		echo -e "$(date)\t$log_exit" >> $log_path
+		echo "=====================END======================" >> $log_path
+		echo " " >> $log_path
+		rm $screen_tmp_path
+		rm $screenmap_tmp_path
+		break
+	elif [ "$select_screen" = "Save" ];then
+		cp $screenmap_tmp_path $screenmap_path >> /dev/null 2>&1
+		rm $screenmap_tmp_path >> /dev/null 2>&1
 		echo -e "$(date)\t$log_finish" >> $log_path
 		echo "=====================END======================" >> $log_path
 		echo " " >> $log_path

@@ -2,6 +2,7 @@
 # 2021-09-15 15:40
 # 2021-09-30 11:00
 # 2021-10-08 11:10
+# 2021-12-01 08:35
 # copyright: kushidou
 
 POSTINST=./kushidoutouch/DEBIAN/postinst

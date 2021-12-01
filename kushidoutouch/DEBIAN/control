@@ -1,9 +1,9 @@
 Package: kushidoutouch
-Version: 1.1.4
+Version: 1.1.5
 Architecture: all
 Maintainer: Kushidou <tangzhen1219@gmail.com>
-Depends: xinput, python3, zenity
-Suggests: python3-pip, python3-pyudev
+Depends: xinput, zenity
+Suggests: python3-pip, python3-pyudev, python3
 Section: x11
 Priority: optional
 Description: Remap touch-screen(s) for Linux X11 with 2 or more screens. 
